@@ -1,39 +1,28 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
+import 'tailwindcss/tailwind.css';
+import React from 'react';
 import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
-
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+import { useTheme, ThemeProvider } from '../contexts/ThemeContext';
+import { TouchableOpacity, Text } from 'react-native';
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+  return (
+    <ThemeProvider>
+      <RootLayoutNavigator />
+    </ThemeProvider>
+  );
+}
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
+function RootLayoutNavigator() {
+  const { isDarkMode, toggleTheme } = useTheme();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <>
       <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
+        <Stack.Screen name="index" options={{ title: 'Habit Tracker', headerRight: () => (<TouchableOpacity onPress={toggleTheme}><Text>{isDarkMode ? 'Light' : 'Dark'}</Text></TouchableOpacity>) }} />
+        <Stack.Screen name="add" options={{ title: 'Add Habit' }} />
       </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+      <StatusBar style={isDarkMode ? 'light' : 'dark'} />
+    </>
   );
 }
